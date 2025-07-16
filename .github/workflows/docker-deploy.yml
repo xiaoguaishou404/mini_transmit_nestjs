@@ -1,0 +1,118 @@
+name: Docker Build and Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm run test
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.prod
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/mini_transmit_nestjs:latest
+          
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            # 创建项目目录（如果不存在）
+            mkdir -p ~/mini_transmit_nestjs
+            cd ~/mini_transmit_nestjs
+            
+            # 创建环境变量文件
+            echo "${{ secrets.ENV_FILE }}" > .env
+            echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> .env
+            
+            # 下载最新的docker-compose文件
+            curl -o docker-compose.prod.yml https://raw.githubusercontent.com/${{ github.repository }}/main/docker-compose.prod.yml
+
+            # 创建并下载 Nginx 配置
+            sudo mkdir -p nginx/conf.d
+            sudo chown -R $USER:$USER nginx
+            curl -o nginx/conf.d/default.conf https://raw.githubusercontent.com/${{ github.repository }}/main/nginx/conf.d/default.conf
+            sudo chmod 644 nginx/conf.d/default.conf
+            
+            # 创建SSL目录并设置SSL证书
+            mkdir -p ssl
+            echo "${{ secrets.SSL_CERTIFICATE }}" > ssl/certificate.crt
+            echo "${{ secrets.SSL_PRIVATE_KEY }}" > ssl/private.key
+            chmod 644 ssl/certificate.crt
+            chmod 600 ssl/private.key
+            
+            # 检查必要文件是否存在
+            echo "检查必要文件..."
+            if [ ! -f "docker-compose.prod.yml" ]; then
+              echo "错误: docker-compose.prod.yml 文件不存在"
+              exit 1
+            fi
+            
+            if [ ! -f "nginx/conf.d/default.conf" ]; then
+              echo "错误: nginx/conf.d/default.conf 文件不存在"
+              exit 1
+            fi
+            
+            if [ ! -f ".env" ]; then
+              echo "错误: .env 文件不存在"
+              exit 1
+            fi
+            
+            if [ ! -f "ssl/certificate.crt" ]; then
+              echo "错误: SSL证书文件不存在"
+              exit 1
+            fi
+            
+            if [ ! -f "ssl/private.key" ]; then
+              echo "错误: SSL私钥文件不存在"
+              exit 1
+            fi
+            
+            echo "所有必要文件检查通过"
+            
+            # 拉取最新的Docker镜像
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/mini_transmit_nestjs:latest
+            
+            # 重启服务
+            sudo docker-compose -f docker-compose.prod.yml down
+            sudo docker-compose -f docker-compose.prod.yml up -d 
