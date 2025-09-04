@@ -141,12 +141,28 @@ Response 200:
 - 如果不存在，创建新的聊天室并返回
 ```
 
-#### 获取聊天室信息
+#### 获取用户的聊天室列表
 ```http
-GET /api/rooms/:id
+GET /api/rooms/user/:userId
 
-Response 200: 同创建聊天室响应格式
-Response 404: 聊天室不存在
+Response 200:
+[
+  {
+    "id": "uuid",
+    "participants": [
+      {
+        "id": "uuid",
+        "nickname": "string",
+        "avatar": "string?"
+      }
+    ],
+    "createdAt": "datetime"
+  }
+]
+
+说明：
+- 返回指定用户参与的所有聊天室
+- 按房间更新时间倒序排列
 ```
 
 ### 3.4 消息接口 (/api/messages)
@@ -367,7 +383,7 @@ CREATE TABLE messages (
 ## 6. 扫码流程
 
 1. **生成二维码**：用户创建后获得 `scanUrl` 和 `qrToken`
-   - scanUrl 格式：`http://localhost:5173/#/pages/chat/chat-entry?token={qrToken}`
+   - scanUrl 格式：`http://localhost:5173/#/pages/scan-result/scan-result?token={qrToken}`
 2. **扫码解析**：扫码者解析URL中的token参数
 3. **查询信息**：调用 `/api/tokens/:token` 获取用户信息
 4. **创建用户**：扫码者需要先创建自己的用户账号
@@ -452,6 +468,7 @@ docker-compose -f docker-compose.prod.yml up -d
 - ✅ 移除聊天室所有者概念 (`owner_id`, `is_owner`)
 - ✅ 简化房间创建逻辑，改为 `joinOrCreateRoom`
 - ✅ 删除 `/api/users/:id/enter-chat` 接口
+- ✅ **删除 `GET /api/rooms/:id` 接口** - 避免重复API，前端通过用户聊天室列表即可获取完整信息
 - ✅ **删除 `POST /api/messages` 接口** - 消息发送统一使用 WebSocket
 - ✅ **优化 `POST /api/messages/upload` 接口** - 职责分离，仅负责文件上传
 - ✅ 优化 `/api/rooms` 接口，支持自动房间匹配

@@ -11,16 +11,8 @@ export class RoomsController {
     return this.roomsService.joinOrCreateRoom(joinOrCreateRoomDto);
   }
 
-  @Get(':id')
-  async getRoomById(@Param('id') id: string): Promise<RoomResponseDto> {
-    const room = await this.roomsService.getRoomById(id);
-    if (!room) {
-      throw new HttpException('聊天室不存在', HttpStatus.NOT_FOUND);
-    }
-    return {
-      id: room.id,
-      participants: room.participants,
-      createdAt: room.createdAt,
-    };
+  @Get('user/:userId')
+  async getUserRooms(@Param('userId') userId: string): Promise<RoomResponseDto[]> {
+    return this.roomsService.getRoomsByUserId(userId);
   }
 } 

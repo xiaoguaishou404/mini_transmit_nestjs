@@ -26,7 +26,7 @@ export class UsersService {
     const qrToken = uuidv4();
     
     // 生成扫码链接（前端将根据此链接生成二维码图片）
-    const scanUrl = `${appConfig.frontendUrl}/#/pages/chat/chat-entry?token=${qrToken}`;
+    const scanUrl = `${appConfig.frontendUrl}/#/pages/scan-result/scan-result?token=${qrToken}`;
     
     const dbUser = await this.databaseService.createUser({
       nickname,
