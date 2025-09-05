@@ -104,4 +104,4 @@ jobs:
 
             # 重启服务
             sudo docker-compose -f docker-compose.prod.yml down
-            sudo docker-compose -f docker-compose.prod.yml up
+            sudo docker-compose -f docker-compose.prod.yml up -d
