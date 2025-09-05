@@ -4,7 +4,7 @@ services:
     container_name: mini_transmit_nestjs_app_prod
     env_file: .env
     ports:
-      - "${NESTJS_PORT}:3000"
+      - "${NESTJS_PORT}:3001"
     restart: unless-stopped
    
 

@@ -9,7 +9,7 @@ RUN npm install
 # dev环境，将通过docker-compose volume挂载源代码热更新，因此dev镜像中不需要复制代码进去
 
 # 暴露端口
-EXPOSE 3000
+EXPOSE 3001
 
 # 启动开发服务器
 CMD ["npm", "run", "start:dev"] 

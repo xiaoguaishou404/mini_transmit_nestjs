@@ -42,7 +42,7 @@ src/
 ### 2.1 必需环境变量
 ```bash
 # 应用配置
-NESTJS_PORT=3000
+NESTJS_PORT=3001
 FRONTEND_URL=http://localhost:5173
 
 # Supabase配置
@@ -250,7 +250,7 @@ Response 200:
 
 ### 4.1 连接
 ```javascript
-const ws = new WebSocket('ws://localhost:3000/socket?userId=user-uuid');
+const ws = new WebSocket('ws://localhost:3001/socket?userId=user-uuid');
 
 // 连接成功后会收到确认消息
 ws.onopen = function() {
@@ -453,8 +453,8 @@ docker-compose -f docker-compose.dev.yml up -d
 ./dev.sh
 
 # 开发环境访问地址：
-# - API服务: http://localhost:3000/api
-# - WebSocket: ws://localhost:3000/socket
+# - API服务: http://localhost:3001/api
+# - WebSocket: ws://localhost:3001/socket
 ```
 
 ### 10.2 生产环境

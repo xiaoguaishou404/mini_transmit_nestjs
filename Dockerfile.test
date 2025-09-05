@@ -13,7 +13,7 @@ RUN npm ci --only=production
 COPY dist ./dist
 
 # 暴露端口
-EXPOSE 3000
+EXPOSE 3001
 
 # 启动生产服务器
 CMD ["node", "dist/main"]
