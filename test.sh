@@ -12,6 +12,11 @@ fi
 
 echo "单元测试通过，继续部署测试环境..."
 
+
+
+npm run build
+
+
 # 启动测试环境容器
 docker-compose -f docker-compose.test.yml down
 docker-compose -f docker-compose.test.yml up --build 

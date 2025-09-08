@@ -27,7 +27,7 @@ describe('AppController', () => {
       expect(resultObj.endpoints).toHaveProperty('users', '/api/users');
       expect(resultObj.endpoints).toHaveProperty('rooms', '/api/rooms');
       expect(resultObj.endpoints).toHaveProperty('messages', '/api/messages');
-      expect(resultObj.endpoints).toHaveProperty('websocket', 'ws://localhost:3000');
+      expect(resultObj.endpoints).toHaveProperty('websocket', 'ws://localhost:3001/socket');
       expect(resultObj.endpoints).toHaveProperty('uploads', '/uploads');
     });
   });

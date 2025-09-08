@@ -1,25 +1,12 @@
-version: "3.8"
-
 services:
   app:
     image: ${DOCKER_USERNAME}/mini_transmit_nestjs:latest
     container_name: mini_transmit_nestjs_app_prod
     env_file: .env
     ports:
-      - "${NESTJS_PORT}:3000"
+      - "${NESTJS_PORT}:3001"
     restart: unless-stopped
    
 
-  nginx:
-    image: nginx:alpine
-    container_name: mini_transmit_nestjs_nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./ssl:/etc/nginx/ssl
-    depends_on:
-      - app
-    restart: unless-stopped
+
 

@@ -15,7 +15,7 @@ export class AppController {
         users: '/api/users',
         rooms: '/api/rooms',
         messages: '/api/messages',
-        websocket: 'ws://localhost:3000/socket',
+        websocket: 'ws://localhost:3001/socket',
         uploads: '/uploads'
       }
     };
